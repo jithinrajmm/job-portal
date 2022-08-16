@@ -1,0 +1,57 @@
+{% load static %}
+			  <header id="header" id="home">
+			    <div class="container-fluid">
+			    	<div class="row align-items-center justify-content-between d-flex">
+				      <div id="logo">
+				        <a href="index.html"><img src="{% static 'img/logo.png' %}" alt="" title="" /></a>
+				      </div>
+				      <nav id="nav-menu-container">
+				        <ul class="nav-menu">
+				          <li class="menu-active"><a class="hov" href="{% url 'home' %}">Home</a></li>
+				          <li><b><a class="hov" href="{% url 'job_list' %}">Job's</a></b></li>
+						  
+						  
+						<li class="menu-has-children"><a href="">Job-Fairs</a>
+				            <ul>
+						  {% if request.user.is_recruiter and request.user.role == 'recruiter' %}
+							<li><a href="{% url 'list_of_job_fair' %}">Job-Fairs</a></li>
+							<li><a href="{% url 'register_job_fair_list' %}">Registerd-Job-Fairs</a></li>
+							<li><a href="{% url 'register_job_fair' %}">Register</a></li>
+						  {% else %}
+						  	<li><a href="{% url 'job_fair_list' %}">Job-Fairsss</a></li>
+						  {% endif %}
+				            </ul>
+				        </li>
+				          <li><a class="hov" href="{% url 'companies_list' %}">Companies</a></li>
+				          <li><a class="hov" href="{% url 'list_of_recruiters' %}">Recruiter's</a></li>
+				          <li><a class="hov" href="contact.html">Contact</a></li>
+						  <!-- adding the job , Recruiter -->
+						  {% if request.user.is_recruiter and request.user.role == 'recruiter' %}
+							<li><a class="hov" href="{% url 'job_post' %}">Post Job</a></li>
+						  {% endif %}
+						  
+						<li class="menu-has-children"><a href="">Profile</a>
+				            <ul>
+						  {% if request.user.is_recruiter and request.user.role == 'recruiter' %}
+							<li><a href="elements.html">Profile</a></li>
+							<li><a href="{% url 'posted_job' %}">Posted Jobs</a></li>
+							<li><a href="{% url 'job_applications' %}">Application's</a></li>
+						  {% else %}
+						  	<li><a href="search.html">Profile</a></li>
+						  {% endif %}
+				            </ul>
+				        </li>
+						  
+						  <!-- login and logout buttons -->
+							{% if request.user.is_authenticated %}
+								<li><a class="ticker-btn" href="{% url 'user_logout' %}">Logout</a></li>
+							{% else %}
+								<li><a class="ticker-btn" href="{% url 'user_creation' %}">Signup</a></li>
+				          		<li><a class="ticker-btn" href="{% url 'user_login' %}">Login</a></li>
+							{% endif %}
+				          				          
+				        </ul>
+				      </nav><!-- #nav-menu-container -->		    		
+			    	</div>
+			    </div>
+			  </header><!-- #header -->

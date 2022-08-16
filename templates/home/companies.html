@@ -1,0 +1,79 @@
+{% extends "base_tem.html" %}
+{% load static %}
+{% block style %}
+<style>
+#card:hover{
+-webkit-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+-moz-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+}
+</style>
+
+  
+{% endblock style %}
+
+{% block body %}
+  
+
+{% include "base/nav.html" %}
+
+
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row d-flex align-items-center justify-content-center">
+						<div class="about-content col-lg-12">
+							<h1 class="text-white">
+								Companies List				
+							</h1>	
+							<p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
+						</div>											
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+            
+       
+			
+			<!-- Start companies Area -->
+			<section class="post-area section-gap">
+
+				<div class="container-fluid">
+					<div class="row justify-content-center">
+						{% for company in companies  %}
+						
+							<div id="card" class="card m-2 " style="width: 18rem;background-color: rgba(0, 0, 0, 0.308);">
+								<img class="card-img-top" src="{{company.image.url}}" alt="Card image cap" height="200px">
+								<div class="card-body text-center shadow-lg">
+									<h5 class="card-title text-white"><a href="{% url 'company_detail' company.id  %}">{{company.company_name}}</a></h5>
+									<p class="card-text text-white">EMAIL: {{company.email}}</p>
+									<p class="card-text text-white">PHONE:{{company.contact_number}}</p>
+									<a class="card-text text-white btn" style="background-color: rgba(52, 52, 108, 0.943);" target="_blank" href="{{company.link}}">Click to visit </a>
+									
+									
+								</div>
+							</div>
+								
+						
+
+						{% endfor %}
+
+					
+					
+	
+
+					</div>
+				</div>	
+			</section>					
+
+
+			<!-- End companies Area -->
+	
+		
+{% include "base/footer.html" %}
+
+
+
+{% endblock body %}
+

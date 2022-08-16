@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block style %}
+<style>
+    button{
+        font-size:x-large ;
+        font-weight: bolder;
+        background-color: rgba(0, 0, 0, 0.436);
+        border: none;
+    }
+    #id_job_fair_name,#id_conducted_date{
+        color: whitesmoke;
+    }
+</style>
+  
+{% endblock style %}
+{% block content %}
+
+   <div class="main-panel">
+          <div class="content-wrapper">
+
+            <div class="row align-items-center justify-content-center">
+                                  <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title text-center">JOB CATEGORY</h4>
+                    
+                    <form method = 'POST' class="forms-sample text-center" action=".">
+                        {% csrf_token %}
+                        {{form|crispy}}
+                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                        <button class="btn btn-dark"><a href="{% url 'category_list'%}"></a> Cancel</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:partials/_footer.html -->
+          <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">jithin raj mm</span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Job Portal </span>
+            </div>
+          </footer>
+          <!-- partial -->
+        </div>
+
+
+  
+{% endblock content %}
+
+    {% block script %}
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            function getId(id){
+                const url = `${window.location.origin}/amn/recruiter_management_activate/${id}/`
+                swal({
+                title: "Are you sure?",
+                text: "Do you want to give the Activate the user",
+                icon: "success",
+                confirmButtonColor: "#063970",
+                buttons: true,
+                
+                })
+                .then((willDelete) => {
+                if (willDelete) {
+                    swal("Success ", {
+                    icon: "success",
+                    
+                    });
+                    window.location = url
+                    
+                } else {
+                    swal(" Cancelled the request ");
+                }
+                });
+                }
+           			
+		
+				{% for msg in messages %}
+					{% if msg.tags == 'success'  %}
+						swal('{{msg}}','thank you',"success");
+					{% else %}
+					swal('{{msg}}','admin@gmail.com',"error");
+					{% endif %}
+				{% endfor %}
+			
+               
+                    
+             
+
+           
+        </script>
+      
+    {% endblock script %}

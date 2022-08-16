@@ -1,0 +1,108 @@
+{% extends "base_tem.html" %}
+{% load static %}
+{% block style %}
+<style>
+#card:hover{
+-webkit-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+-moz-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+}
+</style>
+
+  
+{% endblock style %}
+
+{% block body %}
+  
+
+{% include "base/nav.html" %}
+
+
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row d-flex align-items-center justify-content-center">
+						<div class="about-content col-lg-12">
+							<h1 class="text-white">
+								Posted Job List				
+							</h1>	
+							<p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
+						</div>											
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+            
+       
+			
+			<!-- Start companies Area -->
+			<section class="post-area section-gap">
+
+				<div class="container-fluid">
+					<div class="row justify-content-center d-flex">
+						<!-- side bar start here -->
+						<div class="col-lg-3 sidebar">
+							<div class="single-slidebar">
+								<h4>Jobs by Location</h4>
+								<ul class="cat-list">
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>New York</p><span>37</span></a></li>
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Park Montana</p><span>57</span></a></li>
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Atlanta</p><span>33</span></a></li>
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Arizona</p><span>36</span></a></li>
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Florida</p><span>47</span></a></li>
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Rocky Beach</p><span>27</span></a></li>
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Chicago</p><span>17</span></a></li>
+								</ul>
+							</div>
+
+							<div class="single-slidebar">
+								<h4>Top rated job posts</h4>
+
+							</div>							
+
+							<div class="single-slidebar">
+								<h4>Jobs by Category</h4>
+								<ul class="cat-list">
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Technology</p><span>37</span></a></li>
+								</ul>
+							</div>
+
+						
+
+						</div>
+						<!-- side bar end here -->
+						
+						<!-- job list  -->
+						<div class="col-lg-7 post-list">
+							
+							<div class=" row">
+							{% for application  in  applications %}								
+                                <div class="card col-md-4 m-3 text-white text-center" style="background-color: rgba(6, 122, 154, 0.409);">
+                                <div class="card-header">
+                                   <h3 class="text-white">{{application.user.first_name}}</h3> 
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title text-white"> <b>JOB :</b>  {{application.job.title}}</h5>
+                                    <h5 class="card-title text-white"> <b>COMPANY :</b>  {{application.job.company.company_name}}</h5>
+                    
+                                    <a href="{{application.resume.url}}"  style="background-color: black ;" target="_blank" class="btn btn-primary">Resume</a>
+                                </div>
+                                </div>
+                            {% endfor %}
+							</div>
+							
+
+						</div>
+						<!-- job list end here -->
+
+					</div>
+
+				</div>	
+			</section>					
+
+
+			<!-- End companies Area -->
+{% include "base/footer.html" %}
+{% endblock body %}
+

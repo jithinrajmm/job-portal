@@ -1,0 +1,143 @@
+{% extends "base_tem.html" %}
+{% load static %}
+
+{% block body %}
+  
+
+{% include "base/nav.html" %}
+
+
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row d-flex align-items-center justify-content-center">
+						<div class="about-content col-lg-12">
+							<h1 class="text-white">
+								Job List				
+							</h1>	
+							<p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
+						</div>											
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+			
+			<!-- Start post Area -->
+			<section class="post-area section-gap">
+				<div class="container-fluid">
+					<div class="row justify-content-center d-flex">
+						<!-- side bar start here -->
+						<div class="col-lg-3 sidebar">
+							<div class="single-slidebar">
+								<h4>Jobs by Location</h4>
+								<ul class="cat-list">
+									{% for country in countries  %}
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{country.company.country.name}}</p><span>{{country.c_count}}</span></a></li> 
+									{% endfor %}
+									
+									
+								</ul>
+							</div>
+
+							<div class="single-slidebar">
+								<h4>Top rated job posts</h4>
+
+							</div>							
+
+							<div class="single-slidebar">
+								<h4>Jobs by Category</h4>
+								<ul class="cat-list">
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Technology</p><span>37</span></a></li>
+								</ul>
+							</div>
+
+						
+
+						</div>
+						<!-- side bar end here -->
+						
+						<!-- job list  -->
+						<div class="col-lg-7 post-list">
+							
+							{% for job  in  jobs %}
+							<div class="single-post row">
+								<div class="col-md-2 text-center">
+									<h5 class="text-white"><b>Job Type</b><br>{{job.job_type}}</h5>
+									<img src="{{job.company.image.url}}" style="border-radius: 50%;" width="100px" height="100px">
+									<h6 class="text-white"><a href="{% url 'company_detail' job.company.id  %}">{{job.company.company_name}}</a></h6>
+								</div>
+								<div class="col-md-7">
+																				
+										<a href="single.html"><h4>{{job.title}}</h4></a>
+											<h6>{{job.category}}</h6>	
+										<p>
+											{{job.job_description}}
+										</p>	
+										<div class="titles">
+			
+										</div>
+										
+								</div>
+								<div class="col-md-3">
+									<div class="row justify-content-center align-items-center">
+										
+										<ul class="btns">
+										{% if request.user.is_recruiter and request.user.role == 'recruiter' %}
+											<li><a href="" class="text-white">View</a></li>
+										{% else %}
+												<li><a href="#" class="text-white"><span class="lnr lnr-heart"></span></a></li>
+									
+										{% for aplli in  applied %}
+										
+										{% if aplli.job.id == job.id%}
+										<span class="badge badge-pill badge-danger">APPLIED</span>
+										{% endif %}												  
+										{% endfor %}
+	
+										<li><a href="{% url 'apply_job' job.id %}" class="text-white">Apply</a></li>
+												
+	
+										{% endif %}
+
+										</ul>
+										
+									</div>
+
+								</div>
+
+								
+							</div>
+							{% endfor %}
+
+						</div>
+						<!-- job list end here -->
+
+					</div>
+				</div>	
+			</section>
+			<!-- End post Area -->
+
+			<!-- Start callto-action Area -->
+			<section class="callto-action-area section-gap">
+				<div class="container">
+					<div class="row d-flex justify-content-center">
+						<div class="menu-content col-lg-9">
+							<div class="title text-center">
+								<h1 class="mb-10 text-white">Join us today without any hesitation</h1>
+								<p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore  et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+								<a class="primary-btn" href="#">I am a Candidate</a>
+								<a class="primary-btn" href="#">Request Free Demo</a>
+							</div>
+						</div>
+					</div>	
+				</div>	
+			</section>
+			<!-- End calto-action Area -->			
+		
+{% include "base/footer.html" %}
+
+
+
+{% endblock body %}
+

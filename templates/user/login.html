@@ -1,0 +1,87 @@
+
+{% extends "../base_tem.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block style %}
+
+<style>
+.img{
+    height: 298px;
+    width: 183px;
+    left: 614px;
+    top: 79px;
+    border-radius: 0px;
+    }  
+.login{
+    background-color:#0dece87a; 
+    border-radius: 20px;
+    align-items: center;
+}
+label{
+    color: white;
+}
+.asteriskField {
+    display: none;
+}
+.home-parent{
+    position: relative;
+}
+.home{
+    position: absolute;
+    top: -25px;
+    right: -16px;
+    bottom: 42px;
+}
+
+</style>
+
+  
+{% endblock style %}
+
+{% block body %}
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+                    
+					<div class="row fullscreen d-flex align-items-center justify-content-center">
+
+						<div class="col-md-4 login text-center"  >
+                                                        <div class="row p-2">
+                                <div class="col-1 home-parent">
+                                    <div class="home">
+                                        <h1>
+                                         <a class="text-dark" href="{%  url 'home' %}" style="color:black;"><i class="fa-solid fa-circle-arrow-left text-dark"></i></a>  
+                                       </h1>
+                                        
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="row justify-content-center">
+                                <img class="img" src="{% static 'img/login.png' %}" alt="">
+                            </div>
+
+                            
+                            <form action="." method="POST">
+                                {% csrf_token %}
+                            
+                            
+                            {{form|crispy}}
+                            <div class="row justify-content-center align-items-center m-5">
+                                <button type="submit" class="btn btn-info">
+                                     Login
+                                </button>
+                                
+                            </div>
+                            </form>
+
+                                <div class="row justify-content-center align-items-center m-5">
+                                    <a href="/accounts/google/login/?process=login">Login With Google</a>
+                                </div>
+                        </div>									
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+{% endblock body %}

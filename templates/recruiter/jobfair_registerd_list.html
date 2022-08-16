@@ -1,0 +1,171 @@
+{% extends "base_tem.html" %}
+{% load static %}
+{% block style %}
+<style>
+#card:hover{
+-webkit-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+-moz-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+}
+#date{
+    background-color: #27285c8e;
+    color: white;
+}
+#date:hover{
+    background-image: -webkit-linear-gradient(0deg, #0dece8bd 0%, #27285C 100%); 
+    }
+#btn{
+    background-color: #27285cb6;
+}
+.bt{
+	background-color: #000000fa;
+}
+.swal-modal{
+    background-color: #0dece8bd;
+}
+.swal-button{
+	background-color: #040404;
+	color: white;
+}
+
+
+</style>
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+{% endblock style %}
+
+{% block body %}
+  
+
+{% include "base/nav.html" %}
+
+
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row d-flex align-items-center justify-content-center">
+						<div class="about-content col-lg-12">
+							<h1 class="text-white">
+								Registerd Job Fair's				
+							</h1>	
+							<p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
+						</div>											
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+            
+       
+			
+			<!-- Start companies Area -->
+			<section class="post-area section-gap">
+
+				<div class="container-fluid">
+					<div class="row justify-content-center d-flex">
+						<!-- side bar start here -->
+						<div class="col-lg-3 sidebar">
+							<div class="single-slidebar">
+								<h4>Job Fair By Date</h4>
+                               
+                                
+                                <form action="." method="GET">
+                                 
+                                <!-- Email input -->
+                                <div class="input-group date" id="datepicker">
+                                    <input type="text" id="date"   name="date" class="form-control">
+                                    <span class="input-group-append "  >
+                                        <span class="input-group-text  d-block" style="background-color: #27285c8e;">
+                                            <i class="fa fa-calendar text-white" ></i>
+                                        </span>
+                                    </span>
+                                </div>
+                                
+                                <!-- Submit button -->
+                                
+                                    <button id="btn" type="submit" class="btn  mt-2"><i class="fa-solid fa-magnifying-glass-location text-white"></i></button> 
+                               
+                               
+                                </form>
+                                                        
+							</div>
+						</div>
+						<!-- side bar end here -->
+						
+						<!-- job list  -->
+						<div class="col-lg-7 post-list">
+							
+							
+							{% for job_fair  in  jobfairs %}								
+							<div class=" row">
+																	
+								<div data-toggle="tooltip" data-placement="bottom" title="Click to view the job" class="alert text-white col-md-12 alert-warning alert-dismissible fade show" style="background-color: #49e5fa4c;" role="alert">
+									<a href="" class="text-white"><strong>{{job_fair.jobfair.job_fair_name}}</strong></a>
+									-- {{job_fair.jobfair.conducted_date}}
+								<div class="close">
+									<button id="{{job_fair.id}}" onclick="getId(this.id)"  class="bt"><span aria-hidden="true" style="color: aqua;">&times;</span></button>
+									
+								</div>
+
+								</div>	
+
+							</div>
+                            {% endfor %}
+							
+							
+
+						</div>
+						<!-- job list end here -->
+
+					</div>
+
+				</div>	
+			</section>	
+            {% block scripts %}
+
+            <script type="text/javascript">
+                    $(function() {
+                        $('#datepicker').datepicker({ format: 'yyyy-mm-dd',});
+                    });
+            </script>
+			
+		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            function getId(id){
+                const url = `${window.location.origin}/delete_registerd_job_fair/${id}/`
+                swal({
+                title: "Are you sure",
+                text: "Do you want to unregister",
+                confirmButtonColor: "",
+                
+                buttons: true,
+                background: 'red',
+                
+                })
+                .then((willDelete) => {
+                if (willDelete) {
+                    swal("Success ", {
+                    
+                    
+                    });
+                    window.location = url
+                    
+                } else {
+                    swal("Cancelled the Unegistration ");
+                }
+                });
+              
+                }
+
+        </script>
+			{% endblock scripts %}				
+
+
+			<!-- End companies Area -->
+{% include "base/footer.html" %}
+{% endblock body %}
+

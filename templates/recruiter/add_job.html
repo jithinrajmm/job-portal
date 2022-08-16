@@ -1,0 +1,138 @@
+
+{% extends "../base_tem.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block style %}
+
+<style>
+.img{
+    height: 298px;
+    width: 183px;
+    left: 614px;
+    top: 79px;
+    border-radius: 0px;
+    }  
+.login{
+    background-color:#0dece87a; 
+    border-radius: 20px;
+    align-items: center;
+}
+label{
+    color: white;
+}
+.asteriskField {
+    display: none;
+}
+#id_title,#id_job_type,#id_category_,#id_salary,#id_location,#id_company,#id_job_description,#id_vacancies,#id_experience{
+    background-color: #27285c69;
+    border-radius: 10px;
+    color : white;
+}
+.home-parent{
+    position: relative;
+}
+.home{
+    position: absolute;
+    top: -73px;
+    right: 14px;
+    bottom: 42px;
+    
+    
+}
+</style>
+
+  
+{% endblock style %}
+
+{% block body %}
+
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row fullscreen d-flex align-items-center justify-content-center">
+						<div class="col-md-6 login text-center p-5"  >
+                            
+                            <div class="row p-2">
+                              
+                                <div class="col-1 home-parent">
+                                    <div class="home">
+                                        <h1>
+                                           <i class="fa-solid fa-circle-arrow-left"></i>
+                                       </h1>
+                                        
+                                    </div>
+                                </div> 
+                            </div>
+                            
+                            
+                          
+                            <form action="." method="POST">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{ form.title|as_crispy_field }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{ form.category_|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        {{ form.salary|as_crispy_field }}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{ form.location|as_crispy_field }}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{ form.job_type|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+  
+                                
+                                <div class="form-group">
+                                   {{ form.job_description|as_crispy_field }}
+                                </div>
+                                
+  
+                                
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        {{ form.vacancies|as_crispy_field }}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{ form.company|as_crispy_field }}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{ form.experience|as_crispy_field }}
+                                    </div>
+                                </div>
+                            
+                            
+                            <!-- {{form|crispy}} -->
+                            <div class="row justify-content-center align-items-center m-3">
+                                <button type="submit" class="btn btn-info">
+                                    ADD JOB
+                                </button>
+                            </div>
+                            </form>
+                        </div>									
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+
+  
+{% endblock body %}

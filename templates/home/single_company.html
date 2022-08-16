@@ -1,0 +1,107 @@
+{% extends "base_tem.html" %}
+{% load static %}
+
+{% block body %}
+  
+
+{% include "base/nav.html" %}
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row d-flex align-items-center justify-content-center">
+						<div class="about-content col-lg-12">
+							<h1 class="text-white">
+								Companies List				
+							</h1>	
+							<p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
+						</div>											
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+			<!-- Start companies Area -->
+			<section class="post-area section-gap">
+				<div class="container-fluid">
+					<div class="row align-items-center justify-content-center">
+						<div class="col-6 m-0">
+							<div class="jumbotron m-0" style="background-color: rgba(0, 0, 0, 0.425);">
+								<h1 class="display-4 text-white">{{company.company_name}}</h1>
+								
+								<img src="{{company.image.url}}" alt="" width="500">
+								
+						
+
+							</div>
+						</div>
+						<div class="col-6 m-0">
+							<div class="jumbotron m-0" style="background-color: rgba(0, 0, 0, 0.425);">
+								{% if request.user.is_authenticated %}
+									{% if request.user.role == 'applicant' %}
+									   <h3><a href="{% url 'spam_company' company.id %}" id ='{{company.id}}'  class="text-danger"><span class="lnr lnr-flag"></span> mark spam</a></h3>
+									{% endif %}
+								{% endif %}
+								
+								<hr class="my-4 text-white" style="background-color: rgb(23, 216, 255);">
+								
+				
+								<p class="lead">{{company.email}}</p>
+								<p class="lead">{{company.contact_number}}</p>
+								<p class="lead">{{company.country}}</p>
+								<p class="lead">{{company.places}}</p>
+								
+								<hr class="my-4 text-white" style="background-color: rgb(23, 216, 255);">
+								
+								<p></p>
+
+							</div>
+						</div>
+					</div>
+
+                      
+				</div>	
+			</section>					
+
+
+			<!-- End companies Area -->
+	
+		
+{% include "base/footer.html" %}
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            function getId(id){
+                const url = `${window.location.origin}/spam_company/${id}/`
+                swal({
+                title: "Are you sure?",
+                text: "Do you want to give the Activate the user",
+                icon: "success",
+                confirmButtonColor: "#063970",
+                buttons: true,
+                
+                })
+                .then((willDelete) => {
+                if (willDelete) {
+                    swal("Success ", {
+                    icon: "success",
+                    
+                    });
+                    window.location = url
+                    
+                } else {
+                    swal(" Cancelled the request ");
+                }
+                });
+                }
+           			
+		
+			
+               
+                    
+             
+
+           
+        </script>
+
+{% endblock body %}
+
