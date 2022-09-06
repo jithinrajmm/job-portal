@@ -7,8 +7,9 @@ from django.urls import reverse_lazy,reverse
 
 # models
 from home.models import AppliedJobs, Jobs,JobCategory,SpamCompanies
-from accounts.models import Account,Companies
+from accounts.models import Account,Companies, Intrests
 from admins.models import JobFair,JobFairRegister
+
 
 # error
 from django.shortcuts import get_object_or_404
@@ -35,6 +36,8 @@ from django.contrib.auth.decorators import login_required
 from home.forms import JObAddForm,ApplyJobForm,SpamCompaniesForm,JobEditForm
 from home.forms import JobFairRegisterForm,JobFairSearch
 import datetime
+# for the iframe from same origin
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 
 
@@ -123,6 +126,7 @@ class JobList(ListView):
             i['company'] = company
 
         context['countries'] = countries
+        context['categories'] = JobCategory.objects.all()
         return context
     
 class CompanyList(ListView):
@@ -145,7 +149,6 @@ class CompanyDetail(DetailView):
 class JobApply(View):
     ''' For applying the job , for users''' 
     def get(self,request,job_id):
-        
         try:
             job = Jobs.objects.get(id=job_id)
         except Jobs.DoesNotExist:
@@ -172,9 +175,25 @@ class JobApply(View):
             print(instance)
             
             return redirect('job_list')
+            
+class UserAppliedJobs(ListView):
+    model = AppliedJobs
+    template_name = 'user/applied_job.html'
+    context_object_name = 'applied_jobs'
+    
+    def get_queryset(self):
+        qs = super(UserAppliedJobs,self).get_queryset()
+        return qs.filter(user=self.request.user)
+        
+def unapply_job(request,applied_job_id):
+    ''' deleting the applied jobs '''
+    applied_job = get_object_or_404(AppliedJobs,id = applied_job_id)
+    applied_job.delete()
+    return redirect('user_applied_jobs')
+    
 
 class RecruitersList(ListView):
-    
+    ''' This is for the recruiterlist ''' 
     model = Account
     template_name = 'home/list_of_recruiters.html'
     context_object_name = 'recruiters'
@@ -188,7 +207,7 @@ class RecruitersList(ListView):
         jobs = Jobs.objects.values('company').annotate(ccount = Count('company'))
         companies_id=[i['company']  for i in jobs]
         jobs_objects = Companies.objects.filter(pk__in = companies_id)
-        
+        print(jobs_objects)
         for i in range(len(jobs)):
             jobs[i]['company_name'] = jobs_objects[i].company_name
         
@@ -196,10 +215,59 @@ class RecruitersList(ListView):
         context = super(RecruitersList,self).get_context_data(**kwargs)
         context['jobs'] = jobs 
         return context
+        
+class ApplicantsList(ListView):
+    ''' this is for the list of user from the recruiter side'''
+    model = Account
+    template_name = 'home/applicants_list.html'
+    context_object_name = 'applicants'
+    
+    def get_queryset(self):
+        qs = super().get_queryset() 
+        return qs.filter(role='applicant')
+        
+    def get_context_data(self,**kwargs):
+        context = super(ApplicantsList,self).get_context_data(**kwargs)
+        category = Intrests.objects.values('intrest').annotate(intrest_count=Count('intrest'))
+        user = Account.objects.values().annotate(intrests_count=(Count('intrests')))
+        # taking the values only the intrests, then grouping the intrests
+        # for i in user:
+        #     print(i)
+        #     break
+        # {'id': 30, 'password': 'pbkdf2_sha256$320000$UKZJLjRjGMAhy0kNx8VpnS$CPypxLqfCqiqUWUpLpek0CL9ukMX9zI28Ju566H5hPI=', 'first_name': 'applicant', 'last_name': 'jithin', 'username': 'a', 'email': 'a@gmail.com',
+        #  'phone': '123434343', 'role': 'applicant',
+        #  'date_joined': datetime.datetime(2022, 8, 24, 1, 43, 5, 426090, tzinfo=datetime.timezone.utc), 
+        # 'last_login': datetime.datetime(2022, 8, 24, 1, 43, 6, 154141, tzinfo=datetime.timezone.utc), 'is_admin': False,
+        #  'is_staff': False, 'is_active': True, 'is_superuser': False, 'is_recruiter': False,
+        #  'intrests_count': 1} notice this last adding the all count of the users which repeatedly present in the intrests table
+        
+        
+        # for k in Intrests.objects.values():
+        #     print(k)
+        # {'id': 9, 'user_id': 32, 'intrest': 'REACT DEVELOPER'}
+        # {'id': 10, 'user_id': 32, 'intrest': 'django'}
+        # {'id': 11, 'user_id': 32, 'intrest': 'asdfasdfasdf'}
+        # {'id': 12, 'user_id': 33, 'intrest': 'django'}
+        # {'id': 13, 'user_id': 33, 'intrest': 'asdfasdfasdf'}
+        # {'id': 14, 'user_id': 30, 'intrest': 'django'}
+        print(category)
+        context['category'] = category
+        return context
+        
+        
 class JobFairList(ListView):
+    
     model = JobFair
     template_name='user/job_fairs_list.html'
     context_object_name = 'job_fairs'
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        values = list(JobFairRegister.objects.values_list('jobfair',flat=True))
+        values = list(set(values))
+        qs = qs.filter(id__in = values)
+        return qs
+
 
 # RECRUITER   
 class ListPostedJobs(ListView):
@@ -244,12 +312,31 @@ def delete_job(request,job_id):
 class JobApplications(ListView):
     
     model= AppliedJobs
-    template_name = 'recruiter/application.html'
+    template_name = 'recruiter/user_applied_job.html'
     context_object_name = 'applications'
     
     def get_queryset(self):
         qs = super().get_queryset() 
         return qs.filter(job__company__recruiter=self.request.user)
+        
+
+@method_decorator(xframe_options_sameorigin, name='dispatch')       
+class AppliedJobDetailView(DetailView):
+    model = AppliedJobs
+    template_name = 'recruiter/applied_job_detail.html'
+    context_object_name = 'applied_job'
+
+
+    def get_queryset(self):
+        applied_job = get_object_or_404(AppliedJobs,pk=self.kwargs['pk'])
+        applied_job.viewed = True
+        applied_job.save()
+        qs = super().get_queryset()
+        return qs
+    def get_context_data(self,*args,**kwargs):
+        context = super().get_context_data(*args,**kwargs)
+        return context
+    
         
         
 class SpamCompany(View):
@@ -281,8 +368,7 @@ class SpamCompany(View):
                 return redirect('company_detail',pk=company_id)
 
 
-#JOB FAIR'S
-               
+#JOB FAIR'S           
 def register_job_fair(request):
     
     form = JobFairRegisterForm(request=request)
@@ -320,25 +406,38 @@ class RegisterdJobFairsList(ListView):
             context = self.get_context_data()
             return self.render_to_response(context)
             
-        self.object_list = self.get_queryset
+        self.object_list = self.get_queryset()
         context = self.get_context_data()
-        context['form'] = JobFairSearch()
         return self.render_to_response(context)
         
-from django.db.models import Q       
+from django.db.models import Q 
+      
 class ListJobFairs(ListView):
+    
     model = JobFair
     template_name = 'recruiter/list_of_job_fairs.html'
     context_object_name = 'job_fairs'
     
     def get_queryset(self):
         company = get_object_or_404(Companies,recruiter=self.request.user.id)
-        
         today = datetime.datetime.today()
         qs = super().get_queryset() 
         qs = JobFair.objects.filter(conducted_date__gte=today)
         qs = qs.filter(~Q(company__id=company.id))
         return qs
+        
+    def get(self,request,*args,**kwargs):
+        print(request.GET)
+        if request.GET.get('date'):
+            date = request.GET.get('date')
+            query_set = self.get_queryset() 
+            self.object_list = query_set.filter(conducted_date=date) 
+            context = self.get_context_data()
+            return self.render_to_response(context)
+            
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        return self.render_to_response(context)
         
 def apply_for_job_fair(request,job_fair_id):
     company = get_object_or_404(Companies,recruiter=request.user.id)
@@ -355,6 +454,8 @@ def delete_registerd_job_fair(request,job_fair_id):
     registerd_job = JobFairRegister.objects.get(id=job_fair_id)
     registerd_job.delete()
     return redirect('register_job_fair_list')
+    
+
     
     
 

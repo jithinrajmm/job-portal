@@ -1,0 +1,118 @@
+{% extends "base_tem.html" %}
+{% load static %}
+{% block style %}
+<style>
+#card:hover{
+-webkit-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+-moz-box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
+}
+.gradient-custom-2 {
+/* Chrome 10-25, Safari 5.1-6 */
+background: -webkit-linear-gradient(to right, #0dece8bd 0%, #27285C 100%);
+
+/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+background: linear-gradient(to right,#0dece8bd 0%, #27285C 100%)
+}
+.gradient-custom-1 {
+/* Chrome 10-25, Safari 5.1-6 */
+background: -webkit-linear-gradient(to left, #0dece8bd 0%, #27285C 100%);
+
+/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+background: linear-gradient(to left,#0dece8bd 0%, #27285C 100%)
+}
+</style>
+
+  
+{% endblock style %}
+
+{% block body %}
+  
+
+{% include "base/nav.html" %}
+
+
+            
+       
+<section class="h-100 gradient-custom-2" style="margin-top: 50px;">
+  <div class="container-fluid py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-lg-9 col-xl-7" >
+        <div class="card" >
+          <div class="rounded-top text-white d-flex flex-row gradient-custom-1" style="height:200px;">
+            <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px; margin-left: 25px;">
+              <img src="{{user.profile_pic.url}}"
+                alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
+                style="width: 150px; z-index: 1">
+
+            </div>
+            <div class="ms-3 ml-5" style="margin-top: 130px;">
+              <h5 class="text-white">{{user.first_name}} {{user.last_name}}</h5>
+              <p>{{user.email}}</p>
+            </div>
+          </div>
+          <div class="p-4 text-black mr-5" style="background-color: #f8f9fa;">
+            <div class="d-flex justify-content-end text-center py-1 mr-5">
+              <div>
+                <p class="mb-1 h5"></p>
+                <p class="small text-muted mb-0"></p>
+              </div>
+              
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+                <div class="card-body p-4 text-black">
+                    <div class="mb-5">
+                        <p class="lead fw-normal mb-1">About</p>
+                        <div class="p-4 d-flex justify-content-between" style="background-color: #f8f9fa;">
+                          <div>
+                            <p class="font-italic mb-1">Name</p>
+                            <p class="font-italic mb-1">Country</p>
+                            <p class="font-italic mb-0">Phone</p>
+                          </div>
+                          
+                          <div>
+                            <p class="font-italic mb-1">{{user.firstname}} {{ user.last_name}}</p>
+                            {% if user.country %}
+                              <p class="font-italic mb-1">{{user.country}}</p>
+                              {% else %}
+                              <p class="font-italic mb-1">Not added pleas add</p>
+                            {% endif %}
+                            
+                            <p class="font-italic mb-0">{{user.phone}}</p>
+                          </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-body p-4 text-black">
+                    <div class="mb-5 text-center">
+                        <p class="lead fw-normal mb-1">Area Of Intrests</p>
+                        <div class="p-4" style="background-color: #f8f9fa;">
+                            {% for intrest in intrests  %}
+                              <p class="font-italic mb-1">{{intrest.intrest}}</p>
+                            {% endfor %}
+                            
+  
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+	
+		
+{% include "base/footer.html" %}
+
+
+
+{% endblock body %}
+

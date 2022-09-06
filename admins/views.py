@@ -6,7 +6,7 @@ from django.db.models import Count
 # forms
 from admins.forms import AdminForm,CategoryForm,JobFairAddForm
 # model 
-from admins.models import Admin, JobFair
+from admins.models import Admin, JobFair, JobFairRegister
 from accounts.models import Account, Companies
 from home.models import Companies,SpamCompanies,JobCategory,Jobs
 # error
@@ -190,7 +190,6 @@ def delete_category(request,pk):
 
 #JOB FAIR MANAGEMENT
 def list_job_fair(request):
-    
     job_fairs = JobFair.objects.all()
     context = {
         'job_fairs': job_fairs,
@@ -198,18 +197,47 @@ def list_job_fair(request):
     return render(request,'jobfair/job_fair_list.html',context)
     
 def add_job_fair(request):
+    
     form = JobFairAddForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return redirect('admin_home')
+            return redirect('list_job_fair')
         
     context = {
         'form':form
     }
-    
     return render(request,'jobfair/add_jobfair.html',context)
-
+    
+def job_fair_delete(request,job_fair_id):
+    
+    job_fair = get_object_or_404(JobFair,id = job_fair_id)
+    job_fair.delete()
+    return redirect('list_job_fair')
+    
+def companies_joined_job_fair(request,job_fair_id):
+    """ is used to view the all companies which registerd in the 
+    job fair """
+    companies = JobFairRegister.objects.filter(jobfair__id=job_fair_id)
+    
+    context = {
+        'companies': companies,
+    }
+    return render(request,'jobfair/registered_companies.html',context)
+    
+def edit_job_fair(request,job_fair_id):
+    
+    job_fair = get_object_or_404(JobFair,id = job_fair_id)
+    form = JobFairAddForm(request.POST or None, instance=job_fair)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect('list_job_fair')   
+    context = {
+        'form':form
+    }
+    return render(request,'jobfair/add_jobfair.html',context)
+    
     
         
     

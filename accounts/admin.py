@@ -3,10 +3,11 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from accounts.models import Account,Companies
+from accounts.models import Account,Companies,UserProfile,Counts,Intrests
 
 # Register your models here.
 class AccountAdmin(UserAdmin):
+    
     model = Account
     ordering = ('-date_joined',)
     list_display = ('username','email','first_name','last_name','is_active','is_staff','is_superuser','date_joined','password')
@@ -26,3 +27,6 @@ class AccountAdmin(UserAdmin):
 
 admin.site.register(Account,AccountAdmin)
 admin.site.register(Companies)
+admin.site.register(UserProfile)
+admin.site.register(Counts)
+admin.site.register(Intrests)

@@ -43,11 +43,8 @@
  
                             <td>{{category.category_name}}</td>
                             <td>{{category.created|timesince}}</td>
-                            <td><button><a href="{% url 'edit_category' category.id %}"   class=""><i class="text-success mdi  mdi-tooltip-edit"></i></h3></button></td>
+                            <td><h3><a href="{% url 'edit_category' category.id %}"   class=""><i class="text-success mdi  mdi-tooltip-edit"></i></a></h3></td>
                             <td><button id="{{category.id}}" onclick="getId(this.id)"  class=""><i class="text-danger mdi  mdi-delete"></i></button></td>
-                              
-                            
-                            
                         </tr>
                         
                             {% endfor %}

@@ -52,14 +52,15 @@ class AppliedJobs(models.Model):
     resume = models.FileField(upload_to='pdfs/',validators=[validate_file_extension])
     selected = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
+    viewed = models.BooleanField(default=False)
+    downloaded = models.BooleanField(default=False)
     
     class Meta:
         ordering = ('-created',)
     
     
 class SpamCompanies(models.Model):
-    ''' Spam comapnies '''
-    
+    ''' Spam comapnies'''
     user = models.ForeignKey(Account,on_delete=models.CASCADE)
     company = models.ForeignKey(Companies,on_delete=models.CASCADE)
     count = models.IntegerField()

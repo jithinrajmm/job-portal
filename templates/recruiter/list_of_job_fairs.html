@@ -104,10 +104,13 @@ box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
                                 <div class="w-25 d-flex  align-items-center justify-content-end">
                                     <h5 class="text-white">{{job_fair.conducted_date}}</h5>
                                 </div>
-                                <div class="w-25 d-flex  align-items-center justify-content-end">
+                                {% if request.user.role == 'recruiter' %}
+                                 <div class="w-25 d-flex  align-items-center justify-content-end">
                                     <button id="{{job_fair.id}}" onclick="getId(this.id)"  class="btn"><i class="fa-solid fa-circle-check text-white"></i></button>
                                     
                                 </div>
+                                {% endif %}
+
 							</div>
                             {% endfor %}
 							

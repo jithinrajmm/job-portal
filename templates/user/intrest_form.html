@@ -1,0 +1,65 @@
+
+{% extends "../base_tem.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block style %}
+
+<style>
+.img{
+    height: 298px;
+    width: 183px;
+    left: 614px;
+    top: 79px;
+    border-radius: 0px;
+    }  
+.login{
+    background-color:#0dece87a; 
+    border-radius: 20px;
+    align-items: center;
+}
+label{
+    color: white;
+}
+.asteriskField {
+    display: none;
+}
+#id_last_name,#id_first_name,#id_email,#id_phone,#id_role,#id_password1,#id_password2{
+    background-color: #27285c69;
+    border-radius: 10px;
+    color : white;
+}
+</style>
+
+  
+{% endblock style %}
+
+{% block body %}
+
+
+			<!-- start banner Area -->
+			<section class="banner-area relative" id="home">	
+				<div class="overlay overlay-bg"></div>
+				<div class="container">
+					<div class="row fullscreen d-flex align-items-center justify-content-center">
+						<div class="col-md-4 login text-center p-5"  >
+                          
+                            <form action="." method="POST">
+                                {% csrf_token %}
+                                
+                            
+                            {{form|crispy}}
+                            <div class="row justify-content-center align-items-center m-3">
+                                <button type="submit" class="btn btn-info">
+                                     REGISTER
+                                </button>
+                            </div>
+                            </form>
+                        </div>									
+					</div>
+				</div>
+			</section>
+			<!-- End banner Area -->	
+
+  
+{% endblock body %}

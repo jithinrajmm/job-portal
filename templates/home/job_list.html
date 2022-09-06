@@ -30,7 +30,7 @@
 						<!-- side bar start here -->
 						<div class="col-lg-3 sidebar">
 							<div class="single-slidebar">
-								<h4>Jobs by Location</h4>
+								<h4>Jobs by Countries</h4>
 								<ul class="cat-list">
 									{% for country in countries  %}
 									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{country.company.country.name}}</p><span>{{country.c_count}}</span></a></li> 
@@ -41,14 +41,24 @@
 							</div>
 
 							<div class="single-slidebar">
-								<h4>Top rated job posts</h4>
+								<h4>Job by Location</h4>
+								
+								<ul class="cat-list">
+									{% for job in jobs  %}
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{job.location}}</p><span>{{country.c_count}}</span></a></li> 
+									{% endfor %}
+									
+									
+								</ul>
 
 							</div>							
 
 							<div class="single-slidebar">
 								<h4>Jobs by Category</h4>
 								<ul class="cat-list">
-									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>Technology</p><span>37</span></a></li>
+								{% for category in categories  %}
+									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{category.category_name}}</p><span>{{country.c_count}}</span></a></li> 
+								{% endfor %}
 								</ul>
 							</div>
 

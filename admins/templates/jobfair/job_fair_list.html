@@ -29,10 +29,11 @@
                         <thead>
                           <tr>
 
-                            <th>Name</th>
-                            <th>Created </th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Created </th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Delete</th>
+                            <th class="text-center">Registerd Companies</th>
 
                           </tr>
                         </thead>
@@ -41,10 +42,11 @@
                             {% for job_fair  in job_fairs %}
                         <tr class="text-white">
  
-                            <td>{{job_fair.job_fair_name}}</td>
-                            <td>{{job_fair.conducted_date}}</td>
-                            <td><button><a href=""   class=""><i class="text-success mdi  mdi-tooltip-edit"></i></h3></button></td>
-                            <td><button id="{{category.id}}" onclick="getId(this.id)"  class=""><i class="text-danger mdi  mdi-delete"></i></button></td>
+                            <td class="text-center">{{job_fair.job_fair_name}}</td>
+                            <td class="text-center">{{job_fair.conducted_date}}</td>
+                            <td class="text-center"><button><a href="{% url 'edit_job_fair' job_fair.id %}"   class=""><i class="text-success mdi  mdi-tooltip-edit"></i></h3></button></td>
+                            <td class="text-center"><button id="{{job_fair.id}}" onclick="getId(this.id)"  class=""><i class="text-danger mdi  mdi-delete"></i></button></td>
+                            <td class="text-center"><h4><a class="text-white" style="text-decoration: none;" href="{% url 'list_of_companies' job_fair.id %}">view</a></h4></td>
                               
                             
                             
@@ -80,10 +82,10 @@
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
             function getId(id){
-                const url = `${window.location.origin}/amn/delete_category/${id}/`
+                const url = `${window.location.origin}/amn/job_fair_delete/${id}/`
                 swal({
                 title: "Are you sure?",
-                text: "Do you want to give the Activate the user",
+                text: "Do you want to give the Delete Job Fair",
                 icon: "success",
                 confirmButtonColor: "#063970",
                 buttons: true,
@@ -96,7 +98,7 @@
                     window.location = url
                     
                 } else {
-                    swal(" Cancelled the request ");
+                    swal(" Cancelled the Delete Request");
                 }
                 });
                 }

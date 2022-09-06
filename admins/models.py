@@ -30,6 +30,7 @@ class JobFair(models.Model):
     
     job_fair_name = models.CharField(max_length=100)
     conducted_date = models.DateField()
+    location = models.CharField(max_length=100,null=True)
     company = models.ManyToManyField(Companies,through='JobFairRegister')
     
     # @property
@@ -53,7 +54,7 @@ class JobFairRegister(models.Model):
     registerd_date = models.DateField(auto_now_add=True)
     
     def __str__(self):
-        return self.company.company_name
+        return self.jobfair.job_fair_name
         
     class Meta:
         ordering = ('-registerd_date',)

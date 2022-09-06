@@ -4,6 +4,7 @@
 			    	<div class="row align-items-center justify-content-between d-flex">
 				      <div id="logo">
 				        <a href="index.html"><img src="{% static 'img/logo.png' %}" alt="" title="" /></a>
+						<h6 class="text-white">{{request.user.role}}</h6>
 				      </div>
 				      <nav id="nav-menu-container">
 				        <ul class="nav-menu">
@@ -17,27 +18,37 @@
 							<li><a href="{% url 'list_of_job_fair' %}">Job-Fairs</a></li>
 							<li><a href="{% url 'register_job_fair_list' %}">Registerd-Job-Fairs</a></li>
 							<li><a href="{% url 'register_job_fair' %}">Register</a></li>
+			
 						  {% else %}
 						  	<li><a href="{% url 'job_fair_list' %}">Job-Fairsss</a></li>
 						  {% endif %}
 				            </ul>
 				        </li>
+						{% if request.user.is_recruiter and request.user.role == 'recruiter' %}
+							<li><a class="hov" href="{% url 'list_of_applicants' %}">Applicants's</a></li>
+						{% endif %}
+						
+						{% if request.user.role == 'applicant' %}
+							<li><a class="hov" href="{% url 'list_of_recruiters' %}">Recruiter's</a></li>
+						{% endif %}
+						
 				          <li><a class="hov" href="{% url 'companies_list' %}">Companies</a></li>
-				          <li><a class="hov" href="{% url 'list_of_recruiters' %}">Recruiter's</a></li>
-				          <li><a class="hov" href="contact.html">Contact</a></li>
+				          
+				          <li><a class="hov" href="#footer">Contact</a></li>
 						  <!-- adding the job , Recruiter -->
 						  {% if request.user.is_recruiter and request.user.role == 'recruiter' %}
 							<li><a class="hov" href="{% url 'job_post' %}">Post Job</a></li>
 						  {% endif %}
 						  
-						<li class="menu-has-children"><a href="">Profile</a>
+						<li class="menu-has-children"><a class="text-white">Profile</a>
 				            <ul>
 						  {% if request.user.is_recruiter and request.user.role == 'recruiter' %}
-							<li><a href="elements.html">Profile</a></li>
+							<li><a href="{% url 'user_profile' %}">Profile</a></li>
 							<li><a href="{% url 'posted_job' %}">Posted Jobs</a></li>
 							<li><a href="{% url 'job_applications' %}">Application's</a></li>
 						  {% else %}
-						  	<li><a href="search.html">Profile</a></li>
+						  <li><a href="{% url 'user_profile' %}">Profile</a></li>
+							<li><a href="{% url 'user_applied_jobs' %}">Applied Jobs</a></li>
 						  {% endif %}
 				            </ul>
 				        </li>

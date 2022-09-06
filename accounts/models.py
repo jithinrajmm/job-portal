@@ -1,8 +1,8 @@
+
 from django.db import models
 
 # Create your models here.
 ####################################
-from distutils.command.upload import upload
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin,BaseUserManager
 from django.utils import timezone
@@ -65,7 +65,7 @@ class Account(AbstractBaseUser,PermissionsMixin):
     # Choce fiedls creation
     
     ROLE = (
-        ('Applicant','APPLICANT'),
+        ('applicant','APPLICANT'),
         ('recruiter','RECRUITER')
         )
     
@@ -132,4 +132,39 @@ class Companies(models.Model):
         return self.company_name
     class Meta:
         ordering = ('-updated',)
+        
+class Intrests(models.Model):
+    user = models.ForeignKey(Account,on_delete=models.CASCADE)
+    intrest = models.CharField(max_length=100)
+    
+    def __str___(self):
+        return self.user.username
+        
+class UserProfile(models.Model):
+
+    user = models.OneToOneField(Account,on_delete=models.CASCADE,related_name='profile')
+    profile_pic = models.ImageField(upload_to='profile/',max_length=500,default='profile/avatar.png')
+    first_name = models.CharField(max_length=50,null=True)
+    last_name = models.CharField(max_length=50,null=True)
+    username = models.CharField(max_length=100,null=True)
+    email = models.EmailField(max_length=100,null=True)
+    phone = models.CharField(max_length=15, validators=[RegexValidator(r'^\d{1,15}$')])
+    country = models.CharField(max_length=50,null=True)
+    state = models.CharField(max_length=50,null=True)
+    city = models.CharField(max_length=50,null=True)
+    
+
+    def __str__(self):
+        return self.user.username
+
+#for displaying the count of the user which viewed the profies       
+class Counts(models.Model):
+    
+    user = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
+    viewed_by = models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
+    count = models.IntegerField(default=0)
+    updated = models.DateTimeField(auto_now=True,null=True)
+    
+    def __str__(self):
+        return self.user.username + str(self.count)
         

@@ -12,12 +12,14 @@ urlpatterns = [
     path('companies_list/',views.CompanyList.as_view(),name='companies_list'),
     path('company_detail/<int:pk>/',views.CompanyDetail.as_view(),name='company_detail'),
     path('list_of_recruiters/',views.RecruitersList.as_view(),name='list_of_recruiters'),
+    path('list_of_applicants/',views.ApplicantsList.as_view(),name='list_of_applicants'),
     path('spam_company/<int:company_id>/',views.SpamCompany.as_view(),name='spam_company'),
     # recruiter
     path('posted_job/',views.ListPostedJobs.as_view(),name='posted_job'),
     path('job_applications/',views.JobApplications.as_view(),name='job_applications'),
     path('job_update/<int:pk>/',views.UpdateJob.as_view(),name='job_update'),
     path('job_delete/<int:job_id>/',views.delete_job,name='delete_job'),
+    path('applied_job_detailed_view/<int:pk>/',views.AppliedJobDetailView.as_view(),name='applied_job_detailed_view'),
    
        #job fair register
     path('register_job_fair/',views.register_job_fair,name='register_job_fair'),
@@ -29,6 +31,9 @@ urlpatterns = [
     # user
     path('apply_job/<int:job_id>/',views.JobApply.as_view(),name='apply_job'),
     path('job_fair_list/',views.JobFairList.as_view(),name='job_fair_list'),
+    path('user_applied_jobs/',views.UserAppliedJobs.as_view(),name='user_applied_jobs'),
+    path('unapply_job/<int:applied_job_id>/',views.unapply_job,name='unapply_job'),
+    
     
 
      

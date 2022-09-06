@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+import redis
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +33,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'accounts.apps.AccountsConfig',
     'admins.apps.AdminsConfig',
+    'chat.apps.ChatConfig',
     
     
 ]
@@ -74,7 +78,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 ROOT_URLCONF = 'jobportal.urls'
 
@@ -97,9 +103,18 @@ TEMPLATES = [
 # static files 
 STATIC_URL = 'static/'
 
+
+
+
+# STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+    
 STATICFILES_DIRS = [
-             os.path.join(BASE_DIR,'static'),
-            ]
+        os.path.join(BASE_DIR, 'static/'),
+    ]
+
+# this is for the channels jithin raje
+ASGI_APPLICATION = "jobportal.routing.application"
+# ASGI_APPLICATION = 'mysite.asgi.application'
 
 WSGI_APPLICATION = 'jobportal.wsgi.application'
 
@@ -191,6 +206,30 @@ SOCIAL_AUTH_INACTIVE_USER_URL = '/inactive-user/'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+# this is for the channels layers,
+# it eanbling the layer concept for group chatting 
+# redis is the open sours, in memory datastructure store used as 
+# database ,cache, message body,
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
+ 
 
 # 311428719697-6j5s7tf5sqhv2v1pgtunhouqcu9ave30.apps.googleusercontent.com
 # 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

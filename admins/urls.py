@@ -26,5 +26,9 @@ urlpatterns = [
     # job fair management
     path('add_job_fair/',views.add_job_fair,name='add_job_fair'),
     path('list_job_fair/',views.list_job_fair,name='list_job_fair'),
+    path('list_of_companies/<int:job_fair_id>/',views.companies_joined_job_fair,name='list_of_companies'),
+    path('job_fair_delete/<int:job_fair_id>/',views.job_fair_delete,name='job_fair_delete'),
+    path('edit_job_fair/<int:job_fair_id>/',views.edit_job_fair,name='edit_job_fair'),
+    
     
     ]
