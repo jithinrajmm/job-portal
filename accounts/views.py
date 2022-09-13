@@ -1,4 +1,3 @@
-
 from django.shortcuts import render
 # Create your views here.
 from django.shortcuts import redirect, render
@@ -10,7 +9,7 @@ from django.views import View
 # authentication
 from django.contrib.auth import authenticate,login,logout
 # Databases 
-from accounts.models import Account,Intrests,UserProfile,Counts
+from accounts.models import Account,Intrests,UserProfile,Counts,Companies
 # flash messages 
 from django.contrib import messages 
 # for redirecting the user to the login
@@ -20,12 +19,16 @@ from urllib.parse import urlparse
 from django.db.models import F,Sum,Count,Avg
 # import get_object_or_404()
 from django.shortcuts import get_object_or_404
-
+# JOb category model,
 from home.models import JobCategory
+# decorators
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     forms = AuthenticationForm()
     if request.method == 'POST':
         forms = AuthenticationForm(request,data = request.POST)
@@ -65,6 +68,7 @@ class UserCreation(View):
     ''' user creation view used the class based view '''
     template_name = 'user/register.html'
     form_class = CustomUserCreationForm
+    
     def get(self, request,*args,**kwargs):
         context = {
             'form': self.form_class
@@ -100,9 +104,7 @@ class UserCreation(View):
         return render(request, self.template_name, {'form': form})
         
 def user_intrests(request):
-    
     form = IntrestForm()
-    
     if request.method == 'POST':
         form = IntrestForm(request.POST)
         if form.is_valid():
@@ -116,7 +118,6 @@ def user_intrests(request):
             messages.success(request,'Registraiton success')
             return redirect('home')
                 
-    
     context = {
         'form':form,
     }
@@ -142,20 +143,28 @@ def company_register(request):
         'form':  form,
     }
     return render(request,'recruiter/add_company.html',context)
-    
+ 
+@login_required   
 def user_profile(request):
-    user_profile = UserProfile.objects.get(user=request.user.id)
+    user_profile = get_object_or_404(UserProfile,user=request.user)
     view_sum = Counts.objects.filter(user=user_profile).aggregate(Sum('count'))
     intrests = Intrests.objects.filter(user=user_profile.user)
+    try:
+        company = Companies.objects.get(recruiter=request.user)
+    except:
+        company = None
+        pass
     view_count = Counts.objects.filter(user=user_profile).count()
     context = {
         'user': user_profile,
         'user_intrests': user_intrests,
         'view_count':view_count,
         'intrests':intrests,
+        'company': company,
         }
     return render(request,'user/profile.html',context)
     
+@login_required   
 def others_view_profile(request,id):
     user_profile = UserProfile.objects.get(user=id)
     intrests = Intrests.objects.filter(user=user_profile.user)
@@ -165,7 +174,6 @@ def others_view_profile(request,id):
     if Counts.objects.filter(user=user_profile,viewed_by=current_user).exists():
         user_count = Counts.objects.get(user=user_profile,viewed_by=current_user)
         user_count.count = F('count')+ 1
-        print(user_count.count,'(((((((((((((((((((((((((((((((((((((((((((((')
         user_count.save()
     else:
         Counts.objects.create(user=user_profile,viewed_by=current_user,count=1)
@@ -174,7 +182,8 @@ def others_view_profile(request,id):
         'intrests': intrests,
         }
     return render(request,'user/user_profile_others_view.html',context)
-    
+
+@login_required    
 def user_profile_edit(request,id):
     user_profile = get_object_or_404(UserProfile,id=id)
     form = UserProfileForm(request.POST or None, instance=user_profile)
@@ -190,6 +199,7 @@ def user_profile_edit(request,id):
     }
     return render(request,'user/user_profile_edit.html',context)
     
+@login_required  
 def user_intrest_edit(request,id):
     intrests = Intrests.objects.filter(user=id).values_list('intrest',flat=True)
     category = list(JobCategory.objects.values_list('category_name',flat=True))
@@ -221,10 +231,10 @@ def user_intrest_edit(request,id):
         'form': form,
     }
     return render(request,'user/intrest_form.html',context)
-    
+
+@login_required   
 def profile_view_list(request,user_profile_id):
     profile_viewers = Counts.objects.filter(user=user_profile_id)
-    print(profile_viewers,"%%%%%%%%%%%%%%%%%%%%%%%%")
     context = {
         'profile_viewers':profile_viewers,
     }
@@ -232,8 +242,7 @@ def profile_view_list(request,user_profile_id):
     return render(request,'user/profile_views_list.html',context)
    
 def logout_view(request):
-    ''' logout view of the user , '''
-    
+    ''' logout view of the user,'''
     logout(request)
     return redirect('home')
     

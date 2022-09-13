@@ -136,8 +136,7 @@ class Companies(models.Model):
 class Intrests(models.Model):
     user = models.ForeignKey(Account,on_delete=models.CASCADE)
     intrest = models.CharField(max_length=100)
-    
-    def __str___(self):
+    def __str__(self):
         return self.user.username
         
 class UserProfile(models.Model):

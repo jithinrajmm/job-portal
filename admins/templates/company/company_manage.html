@@ -22,7 +22,7 @@
     <div class="col-lg-12 ">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">New Recruiters</h4>
+                    <h4 class="card-title">New companies</h4>
      
                     <div class="table-responsive">
                       <table class="table ">
@@ -48,7 +48,7 @@
                             </td>
                             <td>{{company.company_name}}</td>
                             <td>{{company.email}}</td>
-                            <td>{{company.country}}</td>
+                            <td>{{company.country.name}}</td>
                             <td>{{company.places}}</td>
                             <td>{{company.recruiter.first_name}}</td>
                             <td>{{company.link|truncatechars:15}}</td>
@@ -71,6 +71,46 @@
                 </div>
               </div> 
             </div>
+                                            <!-- paginator view -->
+                        <div class="col-12 mt-5">
+                          <nav>
+                            <ul class="pagination justify-content-center">
+                                {% if companies.has_other_pages %}
+                                  
+                                  <!-- this is for the previous page -->
+                                  {% if companies.has_previous %}
+                                  <li class=""><a class="btn bg-warning text-dark  active page-link" href="?page={{companies.previous_page_number}}">&laquo; Prev</span></a></li>
+                                  {% else %}
+                                  <li class=""><a class="btn disabled  page-link" style="color: black;" href="#">&laquo; Prev </span></a></li>
+                                  {% endif %}
+                  
+                                  <!-- this is for the all pages available in the paginator -->
+                                  {% for page in  companies.paginator.page_range %}
+                  
+                                      {% if companies.number == page %}
+                                      
+                                      <!-- this is for activation of current page -->
+                                      <li class=""><a class="page-link btn btn-warning   active" href="#" >{{page}} </a></li>
+                  
+                                      {% else %}
+                                      <!-- its for the linking each pages which is not current page -->
+                                      <li class="" ><a class="page-link btn btn-light " style="color: rgb(198, 226, 16);" href="?page={{page}}">{{page}}</a></li>
+                                      {% endif %}
+                                  
+                                  {% endfor %}
+                  
+                                  <!-- this is for the next page number -->
+                                  {% if companies.has_next %}
+                                  <li class=""><a class="btn active bg-warning text-dark  page-link"  href="?page={{companies.next_page_number}}">Next &raquo;</a></li>
+                                  {% else %}
+                                  <li class=""><a class="disabled page-link" style="color: black;" href="">Next &raquo;</a></li>
+                                  {% endif %}
+                  
+                              {% endif %}
+                            </ul>
+                          </nav>
+                      </div>
+                      <!-- paginator end herer -->
 
           </div>
           <!-- content-wrapper ends -->
@@ -89,46 +129,6 @@
 {% endblock content %}
 
     {% block script %}
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        <!-- <script>
-            function getId(id){
-                const url = `${window.location.origin}/amn/user_active/${id}/`
-                swal({
-                title: "Are you sure?",
-                text: "Do you want to give the Activate the user",
-                icon: "success",
-                confirmButtonColor: "#063970",
-                buttons: true,
-                
-                })
-                .then((willDelete) => {
-                if (willDelete) {
-                    swal("Success ", {
-                    icon: "success",
-                    
-                    });
-                    window.location = url
-                    
-                } else {
-                    swal(" Cancelled the request ");
-                }
-                });
-                }
-           			
-		
-				{% for msg in messages %}
-					{% if msg.tags == 'success'  %}
-						swal('{{msg}}','thank you',"success");
-					{% else %}
-					swal('{{msg}}','admin@gmail.com',"error");
-					{% endif %}
-				{% endfor %}
-			
-               
-                    
-             
-
-           
-        </script> -->
+  
       
     {% endblock script %}

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from .models import Thread, ChatMessage
+from chat.models import Thread, ChatMessage
 
 admin.site.register(ChatMessage)
 

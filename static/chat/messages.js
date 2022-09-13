@@ -23,18 +23,14 @@ ws.onopen = async function(event){
     event.preventDefault();
     let message = input_message.val()
     // whom want to send the messages , to user
-    let send_to;
-    if (USER_ID==1){
-        send_to = 37
-    }
-    else{
-        send_to = 1
-    }
+    let send_to = get_active_other_user_id()
+    let thread_id = get_active_thread_id()
     
     let data = {
         'message': message,
         'send_by': USER_ID,
         'send_to': send_to,
+        'thread_id':thread_id,
     }
     data = JSON.stringify(data)
     ws.send(data)
@@ -112,3 +108,26 @@ function newMessage(message,send_by_id) {
 	input_message.val(null);
 }
 
+// contacts
+
+$('.contact-li').on('click',function(){
+    $('.contacts .active').removeClass('active')
+    $(this).addClass('active')
+    //message wrapper also
+    let chat_id = $(this).attr('chat-id')
+    $('.messages-wrapper.is_active').removeClass('is_active')
+    $('.messages-wrapper[chat-id="' + chat_id +'"]').addClass('is_active')
+})
+
+
+function get_active_other_user_id(){
+    let other_user_id = $('.messages-wrapper.is_active').attr('other-user-id')
+    other_user_id = $.trim(other_user_id)
+    return other_user_id
+}
+
+function get_active_thread_id(){
+    let chat_id = $('.messages-wrapper.is_active').attr('chat-id')
+    let thread_id = chat_id.replace('chat_', '')
+    return thread_id
+}

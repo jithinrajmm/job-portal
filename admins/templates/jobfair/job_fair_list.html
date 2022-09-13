@@ -12,6 +12,14 @@
 </style>
   
 {% endblock style %}
+{% block search %}
+<div id="search">
+<form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" action="." method="GET">
+  <input style="color: white; border: 2px solid rgba(255, 0, 0, 0.493);" type="text" name='job_fair' class="form-control text-white" placeholder="Search recruiters">
+</form>
+
+</div>
+{% endblock search %}
 {% block content %}
 
    <div class="main-panel">
@@ -23,7 +31,9 @@
                 <div class="card">
                   <div class="card-body">
                     <h4 class="card-title">Job Fairs</h4>
-     
+                    {% if search_reset %}
+                      <a href="{% url 'list_job_fair' %}" class="btn btn-danger">reset</a>
+                    {% endif %}
                     <div class="table-responsive">
                       <table class="table ">
                         <thead>
@@ -61,6 +71,47 @@
                 </div>
               </div> 
             </div>
+            
+                                  <!-- paginator view -->
+                        <div class="col-12 mt-5">
+                          <nav>
+                            <ul class="pagination justify-content-center">
+                                {% if job_fairs.has_other_pages %}
+                                  
+                                  <!-- this is for the previous page -->
+                                  {% if job_fairs.has_previous %}
+                                  <li class=""><a class="btn bg-warning text-dark  active page-link" href="?page={{job_fairs.previous_page_number}}">&laquo; Prev</span></a></li>
+                                  {% else %}
+                                  <li class=""><a class="btn disabled  page-link" style="color: black;" href="#">&laquo; Prev </span></a></li>
+                                  {% endif %}
+                  
+                                  <!-- this is for the all pages available in the paginator -->
+                                  {% for page in  job_fairs.paginator.page_range %}
+                  
+                                      {% if job_fairs.number == page %}
+                                      
+                                      <!-- this is for activation of current page -->
+                                      <li class=""><a class="page-link btn btn-warning   active" href="#" >{{page}} </a></li>
+                  
+                                      {% else %}
+                                      <!-- its for the linking each pages which is not current page -->
+                                      <li class="" ><a class="page-link btn btn-light " style="color: rgb(198, 226, 16);" href="?page={{page}}">{{page}}</a></li>
+                                      {% endif %}
+                                  
+                                  {% endfor %}
+                  
+                                  <!-- this is for the next page number -->
+                                  {% if job_fairs.has_next %}
+                                  <li class=""><a class="btn active bg-warning text-dark  page-link"  href="?page={{job_fairs.next_page_number}}">Next &raquo;</a></li>
+                                  {% else %}
+                                  <li class=""><a class="disabled page-link" style="color: black;" href="">Next &raquo;</a></li>
+                                  {% endif %}
+                  
+                              {% endif %}
+                            </ul>
+                          </nav>
+                      </div>
+                      <!-- paginator end herer -->
 
           </div>
           <!-- content-wrapper ends -->

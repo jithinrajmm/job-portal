@@ -45,7 +45,7 @@ box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
 					<div class="row d-flex align-items-center justify-content-center">
 						<div class="about-content col-lg-12">
 							<h1 class="text-white">
-								Registerd Job Fair's				
+								Applied Job's				
 							</h1>	
 							<p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
 						</div>											
@@ -101,7 +101,7 @@ box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
                                     <h5 class="text-white">{{job.job.title}}</h5> 
                                 </div>
                                 <div class="w-25 d-flex  align-items-center justify-content-end">
-                                    <h5 class="text-white">{{job.created|timesince}} ago</h5>
+                                    <h5 class="text-white">{{job.created}} ago</h5>
                                 </div>
                                 <div class="w-25 d-flex  align-items-center justify-content-end">
                                     {% if job.viewed %}
@@ -127,7 +127,46 @@ box-shadow: 0px 0px 7px 0px rgba(252,252,252,1);
 						<!-- job list end here -->
 
 					</div>
-
+                    
+							<nav aria-label="Page navigation example">
+							{% if page_obj.has_other_pages %}
+							<ul class="pagination justify-content-center">
+								<li class="page-item ">
+								<a class="page-link" href="?page=1" tabindex="-1">First</a>
+								</li>
+								{% if page_obj.has_previous %} 
+								<li class="page-item ">
+								<a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1"><i class="fa-solid fa-angles-left"></i></a>
+								</li> 
+								{% else %}
+								<li class="page-item disabled"></li>
+								{% endif %}
+								
+								{% for number in  page_obj.paginator.page_range  %}
+								
+								{% if page_obj.number == number %}
+								<li class="page-item active"><a class="page-link" href="?page={{number}}">{{number}}</a></li>
+								{% else %}
+								<li class="page-item"><a class="page-link" href="?page={{number}}">{{number}}</a></li>
+								{% endif %}
+								  
+								{% endfor %}
+								
+								
+								{% if page_obj.has_next %}
+								<li class="page-item ">
+									<a class="page-link" href="?page={{page_obj.next_page_number }}" tabindex="-1"><i class="fa-solid fa-angles-right"></i></a>
+								</li> 
+								{% else %}
+								<li class="page-item disabled"></li>
+								{% endif %}
+								<li class="page-item ">
+									<a class="page-link" href="?page={{page_obj.paginator.num_pages}}" tabindex="-1">Last</a>
+								</li> 
+								
+							</ul>
+							{% endif %}
+							</nav>
 				</div>	
 			</section>	
             {% block scripts %}

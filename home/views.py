@@ -3,51 +3,47 @@
 from django.shortcuts import redirect, render
 from django.db.models import Count
 from django.urls import reverse_lazy,reverse
-
-
 # models
 from home.models import AppliedJobs, Jobs,JobCategory,SpamCompanies
 from accounts.models import Account,Companies, Intrests
 from admins.models import JobFair,JobFairRegister
-
-
 # error
 from django.shortcuts import get_object_or_404
 # messages
 from django.contrib import messages
-
-
 # for viewing the whole items, class based view
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import DeleteView
-
+# this is for the djanog filter views
+from django_filters.views import FilterView
+# job filter
+from home.filter import JobsFilter
 # for updating the existing value in the database
 # its called query expression
-from django.db.models import F
-
+from django.db.models import F,Q
 # decorator
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-
 # forms 
 from home.forms import JObAddForm,ApplyJobForm,SpamCompaniesForm,JobEditForm
 from home.forms import JobFairRegisterForm,JobFairSearch
 import datetime
 # for the iframe from same origin
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-
+# date and time
+from datetime import timedelta
+from django.utils import timezone
 
 
 
 
 # All the recruiter and user view start here 
-
 def home(request):
     count = request.GET.get('intial_value')
-    
+
     if not count:
         count = 1
     else:
@@ -62,11 +58,13 @@ def home(request):
         'companies': companies,
         'jobs': jobs,
         'count': int(count),
-        'job_count': job_count
+        'job_count': job_count,
+        
     }
     return render(request,'home.html',context)
     
 # RECRUITER
+@login_required
 def job_post(request):
     form = JObAddForm(request=request)
     context = {
@@ -79,7 +77,7 @@ def job_post(request):
             job = form.save(commit=False)
             category = form.cleaned_data['category_']
             
-            if JobCategory.objects.filter(category_name=category).exists():
+            if JobCategory.objects.filter(category_name__exact=category).exists():
                 category = JobCategory.objects.get(category_name = category)
                 job.category = category
                 job.save()
@@ -91,26 +89,28 @@ def job_post(request):
                 job.category = new_job_category
                 job.save()
 
-            return redirect('home')
+            return redirect('job_list')
     
     return render(request,'recruiter/add_job.html',context)
     
-# USER  
-class JobList(ListView):
+# USER 
+# ####################################################################################### 
+class JobList(FilterView):
     '''For listing the all jobs '''
     model = Jobs
     template_name = 'home/job_list.html'
     context_object_name = 'jobs'
+    filterset_class = JobsFilter 
+    paginate_by = 4
     
-    def get_queryset(self):
-        
+    def get_queryset(self):    
         qs = super().get_queryset()
-        
         if self.request.user.is_authenticated:
             qs = super().get_queryset()
-            
             if self.request.user.is_recruiter:
                 return qs
+            intrests = [intrest.intrest for intrest in Intrests.objects.filter(user=self.request.user)]
+            qs = qs.filter(category__category_name__in = intrests)
             return qs.exclude(id__in=[ i.job.id for i in AppliedJobs.objects.all()])
         else:
             return qs
@@ -134,6 +134,7 @@ class CompanyList(ListView):
     model = Companies
     template_name = 'home/companies.html'
     context_object_name = 'companies'
+    paginate_by = 10
     def get_queryset(self):
         qs =  super().get_queryset()
         return qs.filter(spam=False)
@@ -172,19 +173,33 @@ class JobApply(View):
             instance.user = request.user
             instance.job = job
             instance.save()
-            print(instance)
-            
+            messages.success(request,'your application success')
             return redirect('job_list')
             
+@method_decorator(login_required,name='dispatch')            
 class UserAppliedJobs(ListView):
+    ''' user applied job list according to user'''
     model = AppliedJobs
     template_name = 'user/applied_job.html'
     context_object_name = 'applied_jobs'
-    
+    paginate_by = 10
     def get_queryset(self):
         qs = super(UserAppliedJobs,self).get_queryset()
         return qs.filter(user=self.request.user)
         
+    def get(self,request,*args,**kwargs):
+        if request.GET.get('date'):
+            date = request.GET.get('date')
+            query_set = self.get_queryset() 
+            self.object_list = query_set.filter(created__date=date) 
+            context = self.get_context_data()
+            return self.render_to_response(context)
+  
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
+@login_required       
 def unapply_job(request,applied_job_id):
     ''' deleting the applied jobs '''
     applied_job = get_object_or_404(AppliedJobs,id = applied_job_id)
@@ -197,13 +212,13 @@ class RecruitersList(ListView):
     model = Account
     template_name = 'home/list_of_recruiters.html'
     context_object_name = 'recruiters'
+    paginate_by = 10
     
     def get_queryset(self):
         qs = super().get_queryset() 
         return qs.filter(is_recruiter=True)
         
     def get_context_data(self,**kwargs):
-        
         jobs = Jobs.objects.values('company').annotate(ccount = Count('company'))
         companies_id=[i['company']  for i in jobs]
         jobs_objects = Companies.objects.filter(pk__in = companies_id)
@@ -216,11 +231,27 @@ class RecruitersList(ListView):
         context['jobs'] = jobs 
         return context
         
+    def get(self,request,*args,**kwargs):
+        if request.GET.get('company'):
+            company = request.GET.get('company')
+            recruiters_list = Companies.objects.values_list('recruiter',flat=True).filter(company_name=company)
+            # print(intrests_users) here we are taking the users based on the 
+            # intrests choosed from the front end
+            query_set = self.get_queryset() 
+            self.object_list = query_set.filter(id__in=recruiters_list) 
+            context = self.get_context_data()
+            return self.render_to_response(context)
+                    
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        return self.render_to_response(context)
+       
 class ApplicantsList(ListView):
     ''' this is for the list of user from the recruiter side'''
     model = Account
     template_name = 'home/applicants_list.html'
     context_object_name = 'applicants'
+    paginate_by = 10
     
     def get_queryset(self):
         qs = super().get_queryset() 
@@ -230,33 +261,29 @@ class ApplicantsList(ListView):
         context = super(ApplicantsList,self).get_context_data(**kwargs)
         category = Intrests.objects.values('intrest').annotate(intrest_count=Count('intrest'))
         user = Account.objects.values().annotate(intrests_count=(Count('intrests')))
-        # taking the values only the intrests, then grouping the intrests
-        # for i in user:
-        #     print(i)
-        #     break
-        # {'id': 30, 'password': 'pbkdf2_sha256$320000$UKZJLjRjGMAhy0kNx8VpnS$CPypxLqfCqiqUWUpLpek0CL9ukMX9zI28Ju566H5hPI=', 'first_name': 'applicant', 'last_name': 'jithin', 'username': 'a', 'email': 'a@gmail.com',
-        #  'phone': '123434343', 'role': 'applicant',
-        #  'date_joined': datetime.datetime(2022, 8, 24, 1, 43, 5, 426090, tzinfo=datetime.timezone.utc), 
-        # 'last_login': datetime.datetime(2022, 8, 24, 1, 43, 6, 154141, tzinfo=datetime.timezone.utc), 'is_admin': False,
-        #  'is_staff': False, 'is_active': True, 'is_superuser': False, 'is_recruiter': False,
-        #  'intrests_count': 1} notice this last adding the all count of the users which repeatedly present in the intrests table
-        
-        
-        # for k in Intrests.objects.values():
-        #     print(k)
-        # {'id': 9, 'user_id': 32, 'intrest': 'REACT DEVELOPER'}
-        # {'id': 10, 'user_id': 32, 'intrest': 'django'}
-        # {'id': 11, 'user_id': 32, 'intrest': 'asdfasdfasdf'}
-        # {'id': 12, 'user_id': 33, 'intrest': 'django'}
-        # {'id': 13, 'user_id': 33, 'intrest': 'asdfasdfasdf'}
-        # {'id': 14, 'user_id': 30, 'intrest': 'django'}
-        print(category)
         context['category'] = category
         return context
         
+    def get(self,request,*args,**kwargs):
+        
+        if request.GET.get('categ'):
+            category = request.GET.get('categ')
+            intrests_users = Intrests.objects.values_list('user',flat=True).filter(intrest=category)
+            # print(intrests_users) here we are taking the users based on the 
+            # intrests choosed from the front end
+            query_set = self.get_queryset() 
+            self.object_list = query_set.filter(id__in=intrests_users) 
+            context = self.get_context_data()
+            return self.render_to_response(context)
+            
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
+        
         
 class JobFairList(ListView):
-    
+    '''To display List of jobfar to user and recruiters'''
     model = JobFair
     template_name='user/job_fairs_list.html'
     context_object_name = 'job_fairs'
@@ -267,9 +294,32 @@ class JobFairList(ListView):
         values = list(set(values))
         qs = qs.filter(id__in = values)
         return qs
+        
+    def get(self,request,*args,**kwargs):
+        
+        if request.GET.get('date') or request.GET.get('place'):
+            
+            if request.GET.get('date'):
+                date = request.GET.get('date')
+                query_set = self.get_queryset() 
+                self.object_list = query_set.filter(conducted_date=date) 
+                context = self.get_context_data()
+                return self.render_to_response(context)
+                        
+            if request.GET.get('place'):
+                place = request.GET.get('place')
+                query_set = self.get_queryset()
+                self.object_list = query_set.filter(Q(location__icontains=place)|Q(job_fair_name__icontains=place))
+                context = self.get_context_data()
+                return self.render_to_response(context)
+            
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
-
+##############################################################################################
 # RECRUITER   
+@method_decorator(login_required,name='dispatch') 
 class ListPostedJobs(ListView):
     '''For listing the Whole posted jobs related by the Recruiter'''
     model = Jobs
@@ -285,32 +335,31 @@ class ListPostedJobs(ListView):
         # recruiter is the feild in the Companies table
         return qs.filter(company__recruiter=self.request.user.id)
 
+@method_decorator(login_required,name='dispatch') 
 class UpdateJob(UpdateView):
-    
+    '''For updating the jobs posted by the recruiter's'''
     model = Jobs
     template_name = 'recruiter/edit_job.html'
     form_class = JobEditForm
     success_url = reverse_lazy('posted_job')
     
-    
-    # def post(self,*args,**kwargs):
-    #     print(self.form_class)
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
          This is necessary to only display members that belong to a given user"""
-
         kwargs = super(UpdateJob, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
         
-# for deleting hte job
+# for deleting the job
+@login_required
 def delete_job(request,job_id):
     job = Jobs.objects.get(id=job_id)
     job.delete()
     return redirect(reverse('posted_job'))
-      
+
+@method_decorator(login_required,name='dispatch')       
 class JobApplications(ListView):
-    
+    """ This view used to showing the applications of applicant"""
     model= AppliedJobs
     template_name = 'recruiter/user_applied_job.html'
     context_object_name = 'applications'
@@ -319,30 +368,50 @@ class JobApplications(ListView):
         qs = super().get_queryset() 
         return qs.filter(job__company__recruiter=self.request.user)
         
-
-@method_decorator(xframe_options_sameorigin, name='dispatch')       
+    def get_context_data(self,*args,**kwargs):
+        context = super().get_context_data(*args,**kwargs)
+        category = [i.job.category.category_name for i in AppliedJobs.objects.filter(job__company__recruiter=self.request.user)]
+        category = list(set(category))
+        context['category'] = category
+        return context
+        
+    def get(self,request,*args,**kwargs):
+        if request.GET.get('category'):
+            category = request.GET.get('category')
+            # category = JobCategory.objects.get(category_name=category)
+            print(category,'*'*100)
+            query_set = self.get_queryset() 
+            self.object_list = query_set.filter(job__category__category_name=category) 
+            context = self.get_context_data()
+            return self.render_to_response(context)
+            
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        return self.render_to_response(context)
+        
+decorators = [login_required,xframe_options_sameorigin]
+@method_decorator(decorators, name='dispatch')      
 class AppliedJobDetailView(DetailView):
     model = AppliedJobs
     template_name = 'recruiter/applied_job_detail.html'
     context_object_name = 'applied_job'
-
-
+    
     def get_queryset(self):
         applied_job = get_object_or_404(AppliedJobs,pk=self.kwargs['pk'])
         applied_job.viewed = True
         applied_job.save()
         qs = super().get_queryset()
         return qs
+        
     def get_context_data(self,*args,**kwargs):
         context = super().get_context_data(*args,**kwargs)
         return context
     
         
-        
+@method_decorator(login_required,name='dispatch')         
 class SpamCompany(View):
-    
+    ''' for spaming companies by users, for adding the reason of spaming'''
     def get(self,request,company_id):
-        user = self.request.user
         company = get_object_or_404(Companies,pk=company_id)
         form = SpamCompaniesForm()
         context = {
@@ -368,11 +437,10 @@ class SpamCompany(View):
                 return redirect('company_detail',pk=company_id)
 
 
-#JOB FAIR'S           
+#JOB FAIR'S 
+@login_required
 def register_job_fair(request):
-    
     form = JobFairRegisterForm(request=request)
-    
     if request.method == 'POST':
         form = JobFairRegisterForm(request.POST,request=request)
         if form.is_valid():
@@ -381,13 +449,12 @@ def register_job_fair(request):
     context = {
         'form': form,
     }
-
     return render(request,'recruiter/register_job_fair.html',context)
 
 
-
+@method_decorator(login_required,name='dispatch')  
 class RegisterdJobFairsList(ListView):
-    
+    ''' For showing the registerd job fairs related to the recruiter'''
     model= JobFairRegister
     template_name = 'recruiter/jobfair_registerd_list.html'
     context_object_name = 'jobfairs'
@@ -410,10 +477,10 @@ class RegisterdJobFairsList(ListView):
         context = self.get_context_data()
         return self.render_to_response(context)
         
-from django.db.models import Q 
+
       
 class ListJobFairs(ListView):
-    
+    ''''''
     model = JobFair
     template_name = 'recruiter/list_of_job_fairs.html'
     context_object_name = 'job_fairs'
@@ -427,7 +494,6 @@ class ListJobFairs(ListView):
         return qs
         
     def get(self,request,*args,**kwargs):
-        print(request.GET)
         if request.GET.get('date'):
             date = request.GET.get('date')
             query_set = self.get_queryset() 
@@ -438,7 +504,8 @@ class ListJobFairs(ListView):
         self.object_list = self.get_queryset()
         context = self.get_context_data()
         return self.render_to_response(context)
-        
+
+@login_required        
 def apply_for_job_fair(request,job_fair_id):
     company = get_object_or_404(Companies,recruiter=request.user.id)
     if JobFairRegister.objects.filter(company=company,jobfair=job_fair_id).exists():
@@ -449,7 +516,7 @@ def apply_for_job_fair(request,job_fair_id):
         jobfair_register.save()
         return redirect('register_job_fair_list')
         
-
+@login_required
 def delete_registerd_job_fair(request,job_fair_id):
     registerd_job = JobFairRegister.objects.get(id=job_fair_id)
     registerd_job.delete()

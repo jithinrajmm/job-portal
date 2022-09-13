@@ -3,7 +3,7 @@
 			    <div class="container-fluid">
 			    	<div class="row align-items-center justify-content-between d-flex">
 				      <div id="logo">
-				        <a href="index.html"><img src="{% static 'img/logo.png' %}" alt="" title="" /></a>
+						<h1 class="ml-5" style="color: rgb(239, 237, 244);">Notifi</h1>
 						<h6 class="text-white">{{request.user.role}}</h6>
 				      </div>
 				      <nav id="nav-menu-container">
@@ -38,6 +38,7 @@
 						  <!-- adding the job , Recruiter -->
 						  {% if request.user.is_recruiter and request.user.role == 'recruiter' %}
 							<li><a class="hov" href="{% url 'job_post' %}">Post Job</a></li>
+							<li><a class="hov" href="{% url 'chat' %}">Message's</a></li>
 						  {% endif %}
 						  
 						<li class="menu-has-children"><a class="text-white">Profile</a>

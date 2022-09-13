@@ -1,6 +1,15 @@
 from django.db import models
+from django.db.models import Q
 
 from accounts.models import Account
+
+
+class ThreadManager(models.Manager):
+    def by_user(self,**kwargs):
+        user = kwargs.get('user')
+        lookup = Q(first_person=user) | Q(second_person=user)
+        qs = self.get_queryset().filter(lookup).distinct()
+        return qs
 
 class Thread(models.Model):
     ''' this model si store the two person 
@@ -11,9 +20,11 @@ class Thread(models.Model):
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     
+    objects = ThreadManager()
+    
     class Meta:
         unique_together = ['first_person','second_person']
-        
+        ordering = ('-updated',)  
 class ChatMessage(models.Model):
     # single thread can have multiple messages
     thread = models.ForeignKey(Thread,on_delete=models.CASCADE,related_name='chatmessage_thread')

@@ -1,5 +1,17 @@
 {% extends "base_tem.html" %}
+{% load crispy_forms_tags %}
 {% load static %}
+
+{% block style %}
+<style>
+	#search_border{
+		padding: 20px;
+		background-color: rgba(0, 0, 0, 0.543);
+		border-radius: 15px;
+	}
+</style>
+  
+{% endblock style %}
 
 {% block body %}
   
@@ -15,8 +27,34 @@
 						<div class="about-content col-lg-12">
 							<h1 class="text-white">
 								Job List				
-							</h1>	
-							<p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
+							</h1>
+							<div class="col-md-12" id="search_border">
+							<form action="." method="GET" class="serach-form-area">
+								<div class="row justify-content-center form-wrap">
+									<div class="col-lg-2 form-cols text-white">
+										{{ filter.form.location__icontains|as_crispy_field }}
+										
+									</div>
+									<div class="col-lg-2 form-cols text-white">
+										{{ filter.form.company__country|as_crispy_field }}
+									</div>
+									<div class="col-lg-2 form-cols text-white">
+										{{ filter.form.company|as_crispy_field }}
+									</div>
+									
+									<div class="col-lg-2 form-cols text-white">
+										{{ filter.form.category|as_crispy_field }}
+									</div>
+									<div class="col-lg-2 form-cols p-2">
+									    <button type="submit" class="btn btn-info mt-3">
+									      <span class="lnr lnr-magnifier"></span> Search
+									    </button>
+									</div>								
+								</div>
+							</form>	
+							</div>
+							<p class="text-white"> <span>Search by tags:</span> Location, Country, Company, category, Design, Development</p>
+							<p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-left"></span>  <a href="category.html"> </a></p>
 						</div>											
 					</div>
 				</div>
@@ -33,7 +71,7 @@
 								<h4>Jobs by Countries</h4>
 								<ul class="cat-list">
 									{% for country in countries  %}
-									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{country.company.country.name}}</p><span>{{country.c_count}}</span></a></li> 
+									<li><a class="justify-content-between d-flex text-white" ><p>{{country.company.country.name}}</p><span>{{country.c_count}}</span></a></li> 
 									{% endfor %}
 									
 									
@@ -44,8 +82,8 @@
 								<h4>Job by Location</h4>
 								
 								<ul class="cat-list">
-									{% for job in jobs  %}
-									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{job.location}}</p><span>{{country.c_count}}</span></a></li> 
+									{% for job in filter.qs  %}
+									<li><a class="justify-content-between d-flex text-white" ><p>{{job.location}}</p><span>{{country.c_count}}</span></a></li> 
 									{% endfor %}
 									
 									
@@ -57,7 +95,7 @@
 								<h4>Jobs by Category</h4>
 								<ul class="cat-list">
 								{% for category in categories  %}
-									<li><a class="justify-content-between d-flex text-white" href="category.html"><p>{{category.category_name}}</p><span>{{country.c_count}}</span></a></li> 
+									<li><a class="justify-content-between d-flex text-white"><p>{{category.category_name}}</p><span>{{country.c_count}}</span></a></li> 
 								{% endfor %}
 								</ul>
 							</div>
@@ -119,35 +157,80 @@
 								
 							</div>
 							{% endfor %}
+							
+							<nav aria-label="Page navigation example">
+							{% if page_obj.has_other_pages %}
+							<ul class="pagination justify-content-center">
+								<li class="page-item ">
+								<a class="page-link" href="?page=1" tabindex="-1">First</a>
+								</li>
+								{% if page_obj.has_previous %} 
+								<li class="page-item ">
+								<a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1"><i class="fa-solid fa-angles-left"></i></a>
+								</li> 
+								{% else %}
+								<li class="page-item disabled"></li>
+								{% endif %}
+								
+								{% for number in  page_obj.paginator.page_range  %}
+								
+								{% if page_obj.number == number %}
+								<li class="page-item active"><a class="page-link" href="?page={{number}}">{{number}}</a></li>
+								{% else %}
+								<li class="page-item"><a class="page-link" href="?page={{number}}">{{number}}</a></li>
+								{% endif %}
+								  
+								{% endfor %}
+								
+								
+								{% if page_obj.has_next %}
+								<li class="page-item ">
+									<a class="page-link" href="?page={{page_obj.next_page_number }}" tabindex="-1"><i class="fa-solid fa-angles-right"></i></a>
+								</li> 
+								{% else %}
+								<li class="page-item disabled"></li>
+								{% endif %}
+								<li class="page-item ">
+									<a class="page-link" href="?page={{page_obj.paginator.num_pages}}" tabindex="-1">Last</a>
+								</li> 
+								
+							</ul>
+							{% endif %}
+							</nav>
 
 						</div>
 						<!-- job list end here -->
+						
+
 
 					</div>
+									<!-- pagination start here -->
+				<!-- pagination end here -->
 				</div>	
 			</section>
 			<!-- End post Area -->
 
-			<!-- Start callto-action Area -->
-			<section class="callto-action-area section-gap">
-				<div class="container">
-					<div class="row d-flex justify-content-center">
-						<div class="menu-content col-lg-9">
-							<div class="title text-center">
-								<h1 class="mb-10 text-white">Join us today without any hesitation</h1>
-								<p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore  et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
-								<a class="primary-btn" href="#">I am a Candidate</a>
-								<a class="primary-btn" href="#">Request Free Demo</a>
-							</div>
-						</div>
-					</div>	
-				</div>	
-			</section>
-			<!-- End calto-action Area -->			
-		
+
+
 {% include "base/footer.html" %}
 
 
 
 {% endblock body %}
+			{% block scripts %}
+
+			<!-- for the flash messages sweetalert -->
+			<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+			
+			<script>
+				{% for msg in messages %}
+					{% if msg.tags == 'success'  %}
+						swal('{{msg}}','thank you',"success");
+					{% else %}
+					swal('{{msg}}','',"error");
+					{% endif %}
+				{% endfor %}
+			</script>
+			
+			{% endblock scripts %}
 

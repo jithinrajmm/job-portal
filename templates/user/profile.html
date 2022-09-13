@@ -52,6 +52,7 @@ background: linear-gradient(to left,#0dece8bd 0%, #27285C 100%)
             <div class="ms-3 ml-5" style="margin-top: 130px;">
               <h5 class="text-white">{{user.first_name}}  {{user.last_name}}</h5>
               <p>{{user.email}}</p>
+              
             </div>
           </div>
           <div class="p-4 text-black mr-5" style="background-color: #f8f9fa;">
@@ -82,6 +83,9 @@ background: linear-gradient(to left,#0dece8bd 0%, #27285C 100%)
                             <p class="font-italic mb-1">Name</p>
                             <p class="font-italic mb-1">Country</p>
                             <p class="font-italic mb-0">Phone</p>
+                            {% if company %}
+                              <p class="font-italic mb-0">Comapny</p>
+                            {% endif %}
                           </div>
                           
                           <div>
@@ -93,6 +97,9 @@ background: linear-gradient(to left,#0dece8bd 0%, #27285C 100%)
                             {% endif %}
                             
                             <p class="font-italic mb-0">{{user.phone}}</p>
+                            {% if company %}
+                            <p>{{company.company_name}}</p> 
+                            {% endif %}
                           </div>
 
                         </div>

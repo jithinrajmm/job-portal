@@ -5,6 +5,7 @@ from admins import views
 urlpatterns = [
     path('',views.admin_home,name='admin_home'),
     path('login/',views.admin_login,name='admin_login'),
+    path('admin_logout/',views.admin_logout,name='admin_logout'),
     # recruiter
     path('recruiter_activation/',views.recruiter_activation,name='recruiter_activation'),
     path('activate_recruiter/<int:pk>/',views.activate_recruiter,name='activate_recruiter'),

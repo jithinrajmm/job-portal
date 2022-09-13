@@ -24,7 +24,7 @@ class CompaniesForm(ModelForm):
 
 # Intrests creation models 
 
-INTREST_CHOICES = tuple(((i.category_name,i.category_name) for i in JobCategory.objects.all() ))
+INTREST_CHOICES = tuple(((i.category_name,i.category_name) for i in JobCategory.objects.all()))
 
 class IntrestForm(forms.Form):
     inrests = forms.MultipleChoiceField(choices = INTREST_CHOICES)
